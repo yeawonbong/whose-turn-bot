@@ -32,7 +32,7 @@ def count_turn(기준일자) -> int:
 
     today = dt.date(dt.now())
 
-    # 기준일 년부터 당해 년까지의 공휴일 가져오기
+    # 기준일 년부터 익년까지의 공휴일 가져오기
     for year in range(기준일자.year, today.year+1):
         for holiday in pytimekr.holidays(year):
             if holiday not in holidays:  # 중복 방지
