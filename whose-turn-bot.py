@@ -27,15 +27,25 @@ def get_dates(start_date, end_date):
 def count_turn(기준일자) -> int:
     """Count the number of business days after the given date"""
 
-    # Get holidays
-    holidays = pytimekr.holidays()
+    # 공휴일 리스트 초기화
+    holidays = []
+
+    today = dt.date(dt.now())
+
+    # 기준일 년부터 당해 년까지의 공휴일 가져오기
+    for year in range(기준일자.year, today.year+1):
+        for holiday in pytimekr.holidays(year):
+            if holiday not in holidays:  # 중복 방지
+                holidays.append(holiday)
 
     # Add custom holidays
     holidays.append(dt.date(dt(2024, 5, 1))) #노동절
     holidays.append(dt.date(dt(2024, 5, 6))) #어린이날 대체휴일
     holidays.append(dt.date(dt(2024,10, 1))) #국군의날 휴일
 
-    today = dt.date(dt.now())
+    # 정렬
+    holidays.sort()
+
     print(holidays)
     if(today in holidays or today.weekday() > 4):
         return -1
@@ -49,16 +59,17 @@ def count_turn(기준일자) -> int:
     return turnCnt
 
 async def send_turn():
-    mbrCnt = 24
-    turn = count_turn(dt.date(dt(2024, 10, 25)))
+    # List of names
+    names = ['아이유', '박보검', '공효진', '현빈', '손예진'\
+            , '김수현', '이민호', '박신혜', '송중기', '수지'\
+            , '이준기', '전지현', '송혜교', '지창욱', '한지민'\
+            , '김우빈', '박서준', '윤아', '정해인', '유아인'\
+            , '신민아', '고아라', '이동욱', '박보영']
+    mbrCnt = len(names)
+    print("mbrCnt:" + str(mbrCnt))
+    turn = count_turn(dt.date(dt(2025, 1, 2))) # 순번 시작 기준일
     if 0 <= turn :
         turn %= mbrCnt
-        # List of names
-        names = ['아이유', '박보검', '공효진', '현빈', '손예진'\
-                , '김수현', '이민호', '박신혜', '송중기', '수지'\
-                , '이준기', '전지현', '송혜교', '지창욱', '한지민'\
-                , '김우빈', '박서준', '윤아', '정해인', '유아인'\
-                , '신민아', '고아라', '이동욱', '박보영']
 
         # Create a dictionary mapping numbers to random names
         mapping = {i: names[i] for i in range(0, mbrCnt)}
@@ -68,7 +79,7 @@ async def send_turn():
         print(str(turn) + "번째, " + str(dt.date(dt.now())) + " " + msg)
         
         # 텔레그램 메시지 전송
-        await bot.send_message(chat_id='-4177045035', text=msg) #배치모니터링
+        # await bot.send_message(chat_id='-4177045035', text=msg) #배치모니터링
         
         # Teams 메시지 전송
         teams_message = {
